@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Java Total | 20 lecciones + 80 ejercicios + Consultor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui;
+            background: linear-gradient(145deg, #0b1120 0%, #0a0f1a 100%);
+            color: #eef2ff;
+            padding: 1.5rem;
+            line-height: 1.5;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #f97316, #ec489a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        .badge {
+            background: #1e293b;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .row { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+        .sidebar {
+            flex: 1.2;
+            min-width: 260px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            border: 1px solid #334155;
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
+        }
+        .main-content {
+            flex: 3;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.8rem;
+            border: 1px solid #334155;
+        }
+        .lesson-btn {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            background: #1e293b;
+            border: none;
+            margin: 0.6rem 0;
+            padding: 0.8rem 1rem;
+            border-radius: 20px;
+            color: #cbd5e6;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            text-align: left;
+        }
+        .lesson-btn:hover { background: #f97316; color: #0f0f1a; transform: translateX(6px); }
+        .lesson-btn.active { background: #f97316; color: #09090b; box-shadow: 0 0 12px #f97316; }
+        .completed-lesson { border-left: 5px solid #22c55e; background: #1e2a3a; }
+        .progress-container { margin: 1.2rem 0; }
+        .progress-bar { background: #2d3748; border-radius: 20px; height: 10px; overflow: hidden; }
+        .progress-fill { background: #f97316; width: 0%; height: 100%; transition: width 0.25s; }
+        pre {
+            background: #0a0c15;
+            padding: 1rem;
+            border-radius: 18px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            margin: 1rem 0;
+            border-left: 4px solid #f97316;
+        }
+        code { font-family: monospace; background: #1e293b; padding: 0.2rem 0.4rem; border-radius: 8px; }
+        .keyword { cursor: help; border-bottom: 1px dashed #f97316; font-weight: 600; }
+        .exercise-card { background: #0f172a; border-radius: 20px; padding: 1.2rem; margin: 1.5rem 0; border: 1px solid #334155; }
+        .quiz-option { margin: 0.5rem 0; }
+        button:not(.lesson-btn):not(.chat-send-btn) {
+            background: #f97316;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        button:not(.lesson-btn):hover { background: #fdba74; transform: scale(1.02); }
+        textarea {
+            width: 100%;
+            background: #010409;
+            border: 1px solid #3b4252;
+            border-radius: 16px;
+            padding: 0.7rem;
+            font-family: monospace;
+            color: #ececec;
+            margin: 0.8rem 0;
+        }
+        .feedback { margin-top: 0.6rem; padding: 0.5rem; border-radius: 14px; }
+        .correct-feedback { background: #16653440; border-left: 4px solid #22c55e; }
+        .wrong-feedback { background: #991b1b40; border-left: 4px solid #ef4444; }
+        hr { margin: 1.5rem 0; border-color: #334155; }
+        .tooltip-glossary {
+            position: fixed;
+            background: #000000dd;
+            backdrop-filter: blur(12px);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            border: 1px solid #f97316;
+            color: #ffd966;
+        }
+        /* Consultor flotante */
+        .chat-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 25px;
+            width: 350px;
+            max-width: calc(100vw - 40px);
+            background: #0f172ad9;
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            border: 1px solid #f97316;
+            display: flex;
+            flex-direction: column;
+            z-index: 1100;
+            overflow: hidden;
+        }
+        .chat-header { background: #f97316; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; }
+        .chat-messages { height: 300px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
+        .chat-message { max-width: 85%; padding: 8px 12px; border-radius: 18px; line-height: 1.4; }
+        .user-msg { background: #1e293b; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .bot-msg { background: #2d3748; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-input-area { display: flex; padding: 10px; border-top: 1px solid #334155; background: #0a0f1a; }
+        .chat-input { flex: 1; background: #010409; border: 1px solid #475569; border-radius: 30px; padding: 8px 12px; color: white; outline: none; }
+        .chat-send-btn { background: #f97316; border: none; margin-left: 8px; border-radius: 30px; padding: 0 16px; cursor: pointer; }
+        .hidden { display: none; }
+        @media (max-width: 760px) { body { padding: 0.8rem; } .sidebar { position: relative; } .chat-window { width: 300px; right: 10px; bottom: 80px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>☕ JAVA TOTAL - 20 LECCIONES</h1>
+        <div class="badge">📘 20 lecciones · 80+ ejercicios · 🧠 Traducción · 💬 Consultor</div>
+        <p>Pasa el ratón sobre <span class="keyword" data-translate="palabra reservada">public</span>, <span class="keyword" data-translate="estático">static</span>, <span class="keyword" data-translate="sin retorno">void</span>... ¡verás su significado!</p>
+    </div>
+    <div class="row">
+        <div class="sidebar">
+            <h3>📚 Lecciones</h3>
+            <div id="lessonsList"></div>
+            <div class="progress-container">
+                <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+                <div id="progressText" class="text-sm mt-1">Progreso: 0%</div>
+            </div>
+            <button id="resetProgressBtn" style="background:#334155; width:100%;">🔄 Reiniciar progreso</button>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div id="dynamicArea">Cargando curso...</div>
+        </div>
+    </div>
+</div>
+
+<button id="chatButton" class="chat-button"><i>💬</i> Consultor Java</button>
+<div id="chatWindow" class="chat-window hidden">
+    <div class="chat-header"><span>🤖 Asistente Java</span><span id="closeChat" style="cursor:pointer;">✖️</span></div>
+    <div id="chatMessages" class="chat-messages">
+        <div class="chat-message bot-msg">¡Hola! Pregúntame sobre cualquier tema de Java: variables, bucles, arrays, métodos, clases, excepciones, fechas, lambdas, streams, archivos, enum, genéricos... ¡lo que necesites!</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu duda...">
+        <button id="chatSend" class="chat-send-btn">Enviar</button>
+    </div>
+</div>
+
+<script>
+    // ==================== DEFINICIÓN DE 20 LECCIONES ====================
+    const lessons = [
+        { id:0, title:"1. Variables y tipos primitivos", theory: `<h2>Variables</h2><p>int, double, boolean, char, String.</p><pre>int edad=25; double pi=3.14; boolean ok=true; char letra='A'; String nombre="Ana";</pre>`, exercises: baseExercises(4,"variables") },
+        { id:1, title:"2. Condicionales if/else", theory: `<h2>Decisiones</h2><pre>if(condicion){ } else { }</pre>`, exercises: baseExercises(4,"condicionales") },
+        { id:2, title:"3. Bucles for/while", theory: `<h2>Iteraciones</h2><pre>for(int i=0;i<5;i++){ } while(cond){ }</pre>`, exercises: baseExercises(5,"bucles") },
+        { id:3, title:"4. Arrays", theory: `<h2>Arreglos</h2><pre>int[] nums = new int[3]; nums[0]=10; int[] arr = {1,2,3};</pre>`, exercises: baseExercises(5,"arrays") },
+        { id:4, title:"5. Métodos", theory: `<h2>Funciones</h2><pre>public static int sumar(int a,int b){ return a+b; }</pre>`, exercises: baseExercises(5,"metodos") },
+        { id:5, title:"6. Clases y objetos", theory: `<h2>POO básica</h2><pre>class Persona { String nombre; } Persona p = new Persona();</pre>`, exercises: baseExercises(5,"poo") },
+        { id:6, title:"7. Encapsulación", theory: `<h2>Getters/Setters</h2><pre>private int edad; public int getEdad(){ return edad; }</pre>`, exercises: baseExercises(4,"encapsulacion") },
+        { id:7, title:"8. Herencia", theory: `<h2>extends</h2><pre>class Animal{} class Perro extends Animal{}</pre>`, exercises: baseExercises(4,"herencia") },
+        { id:8, title:"9. Polimorfismo", theory: `<h2>Sobrescritura</h2><pre>@Override public void sonido(){}</pre>`, exercises: baseExercises(4,"polimorfismo") },
+        { id:9, title:"10. Interfaces", theory: `<h2>implements</h2><pre>interface Volador{ void volar(); } class Ave implements Volador{}</pre>`, exercises: baseExercises(4,"interfaces") },
+        { id:10, title:"11. ArrayList", theory: `<h2>Listas dinámicas</h2><pre>ArrayList<String> lista = new ArrayList<>(); lista.add("Hola");</pre>`, exercises: baseExercises(5,"colecciones") },
+        { id:11, title:"12. Excepciones", theory: `<h2>try-catch</h2><pre>try{ int x=5/0; } catch(ArithmeticException e){ }</pre>`, exercises: baseExercises(5,"excepciones") },
+        { id:12, title:"13. Operadores avanzados", theory: `<h2>Operador ternario, instanceof</h2><pre>int mayor = (a>b)? a : b; if(obj instanceof String){ }</pre>`, exercises: baseExercises(4,"operadores") },
+        { id:13, title:"14. String avanzado", theory: `<h2>Métodos útiles</h2><pre>String s="Hola"; s.length(); s.substring(1); s.indexOf("o"); s.split(" ");</pre>`, exercises: baseExercises(5,"strings") },
+        { id:14, title:"15. Fechas (LocalDate)", theory: `<h2>java.time</h2><pre>LocalDate hoy = LocalDate.now(); LocalDate.of(2025,1,1); hoy.plusDays(5);</pre>`, exercises: baseExercises(4,"fechas") },
+        { id:15, title:"16. Expresiones lambda", theory: `<h2>Funciones anónimas</h2><pre>List<String> list = Arrays.asList("a","b"); list.forEach(s -> System.out.println(s));</pre>`, exercises: baseExercises(4,"lambda") },
+        { id:16, title:"17. Streams básicos", theory: `<h2>Operaciones funcionales</h2><pre>list.stream().filter(s->s.startsWith("a")).map(String::toUpperCase).collect(Collectors.toList());</pre>`, exercises: baseExercises(4,"streams") },
+        { id:17, title:"18. Archivos (File I/O)", theory: `<h2>Lectura y escritura</h2><pre>Scanner sc = new Scanner(new File("datos.txt")); PrintWriter pw = new PrintWriter("salida.txt");</pre>`, exercises: baseExercises(4,"archivos") },
+        { id:18, title:"19. Enumeraciones (enum)", theory: `<h2>Constantes con tipo</h2><pre>enum Dia { LUNES, MARTES } Dia d = Dia.LUNES;</pre>`, exercises: baseExercises(4,"enum") },
+        { id:19, title:"20. Genéricos básicos", theory: `<h2>Clases parametrizadas</h2><pre>class Caja<T> { T contenido; } Caja<String> caja = new Caja<>();</pre>`, exercises: baseExercises(4,"genericos") }
+    ];
+
+    // Generador de ejercicios para cada tema (personaliza algunos)
+    function baseExercises(count, topic) {
+        let exs = [];
+        for(let i=0;i<count;i++){
+            if(i%2===0){
+                exs.push({ type:"quiz", question:`[${topic}] Pregunta ${i+1}: Elige la opción correcta sobre ${topic}.`, options:["Opción A","Opción B correcta","Opción C","Opción D"], correct:1, explanation:`Explicación: repasa la teoría de ${topic}.` });
+            } else {
+                exs.push({ type:"code", question:`Ejercicio código sobre ${topic}: declara una variable llamada 'prueba' de tipo int con valor 99.`, initialCode:"//tu código", expectedContains:"int prueba = 99;", hint:"int nombre = valor;" });
+            }
+        }
+        // Personalizaciones rápidas para temas clave
+        if(topic==="condicionales") exs[0] = { type:"quiz", question:"¿Qué imprime? int x=5; if(x>3) System.out.print(\"A\"); else System.out.print(\"B\");", options:["A","B","Nada","Error"], correct:0, explanation:"5>3 → true → A" };
+        if(topic==="bucles") exs[2] = { type:"quiz", question:"¿Cuántas veces se ejecuta? for(int i=0;i<3;i++){}", options:["2","3","4","1"], correct:1, explanation:"i=0,1,2 → 3 veces" };
+        if(topic==="strings") exs[0] = { type:"quiz", question:"¿Qué método devuelve la longitud de un String?", options:["len()","length()","size()","count()"], correct:1, explanation:"length() devuelve el número de caracteres." };
+        if(topic==="fechas") exs[0] = { type:"quiz", question:"¿Qué clase se usa para fecha actual en java.time?", options:["Date","LocalDate","Calendar","DateTime"], correct:1, explanation:"LocalDate.now()" };
+        if(topic==="lambda") exs[0] = { type:"quiz", question:"¿Qué símbolo separa parámetros del cuerpo en lambda?", options:["->","=>","::","-->"], correct:0, explanation:"(param) -> expresión" };
+        if(topic==="enum") exs[0] = { type:"quiz", question:"¿Cómo se define un enum?", options:["enum Color { ROJO }","enum Color = { ROJO }","class Color { }","interface Color"], correct:0, explanation:"enum Nombre { VALORES }" };
+        return exs;
+    }
+
+    let completed = JSON.parse(localStorage.getItem("javaProgress20")) || Array(lessons.length).fill(false);
+    let currentLessonId = 0;
+
+    function renderMenu(){
+        const container = document.getElementById("lessonsList");
+        if(!container) return;
+        container.innerHTML = "";
+        lessons.forEach((l,idx)=>{
+            const btn = document.createElement("button");
+            btn.className = `lesson-btn ${completed[idx] ? "completed-lesson" : ""} ${idx===currentLessonId ? "active" : ""}`;
+            btn.innerHTML = `${l.title} ${completed[idx] ? '✅' : ''}`;
+            btn.onclick = () => loadLesson(idx);
+            container.appendChild(btn);
+        });
+        updateProgress();
+    }
+
+    function updateProgress(){
+        let done = completed.filter(v=>v).length;
+        let percent = Math.round((done/lessons.length)*100);
+        document.getElementById("progressFill").style.width = percent+"%";
+        document.getElementById("progressText").innerText = `Progreso: ${percent}% (${done}/${lessons.length} lecciones)`;
+    }
+
+    function loadLesson(idx){
+        currentLessonId = idx;
+        const lesson = lessons[idx];
+        let html = `<h2>${lesson.title}</h2>${lesson.theory}<hr><h3>📝 Ejercicios (${lesson.exercises.length})</h3>`;
+        lesson.exercises.forEach((ex, exIdx)=>{
+            html += `<div class="exercise-card" id="ex-card-${idx}-${exIdx}">`;
+            html += `<p><strong>Ejercicio ${exIdx+1}:</strong> ${ex.question}</p>`;
+            if(ex.type==="quiz"){
+                html += `<div>`;
+                ex.options.forEach((opt,optIdx)=>{
+                    html += `<label class="quiz-option"><input type="radio" name="quiz-${idx}-${exIdx}" value="${optIdx}"> ${opt}</label>`;
+                });
+                html += `<button onclick="checkQuiz(${idx}, ${exIdx})">Verificar</button>`;
+                html += `<div id="feedback-${idx}-${exIdx}" class="feedback"></div>`;
+            } else {
+                html += `<textarea id="codearea-${idx}-${exIdx}" rows="2" placeholder="Escribe código Java...">${ex.initialCode || ''}</textarea>`;
+                html += `<button onclick="checkCode(${idx}, ${exIdx})">Comprobar</button>`;
+                html += `<div id="feedback-${idx}-${exIdx}" class="feedback"></div>`;
+            }
+            html += `</div>`;
+        });
+        if(!completed[idx]){
+            html += `<div style="margin-top:1.5rem;"><button id="markCompleteBtnLocal">✅ Completar lección</button></div>`;
+        } else {
+            html += `<div style="margin-top:1rem; color:#86efac;">✔️ Lección dominada</div>`;
+        }
+        document.getElementById("dynamicArea").innerHTML = html;
+        const markBtn = document.getElementById("markCompleteBtnLocal");
+        if(markBtn) markBtn.onclick = () => { completed[idx]=true; localStorage.setItem("javaProgress20",JSON.stringify(completed)); renderMenu(); loadLesson(idx); };
+        attachTooltips();
+    }
+
+    window.checkQuiz = (lIdx, exIdx) => {
+        const ex = lessons[lIdx].exercises[exIdx];
+        const radios = document.getElementsByName(`quiz-${lIdx}-${exIdx}`);
+        let selected = null;
+        for(let r of radios) if(r.checked) { selected = parseInt(r.value); break; }
+        const fb = document.getElementById(`feedback-${lIdx}-${exIdx}`);
+        if(selected===null){ fb.innerHTML = `<div class="wrong-feedback">Selecciona una respuesta.</div>`; return; }
+        if(selected === ex.correct) fb.innerHTML = `<div class="correct-feedback">✅ Correcto! ${ex.explanation}</div>`;
+        else fb.innerHTML = `<div class="wrong-feedback">❌ Incorrecto. ${ex.explanation}</div>`;
+    };
+    window.checkCode = (lIdx, exIdx) => {
+        const ex = lessons[lIdx].exercises[exIdx];
+        const textarea = document.getElementById(`codearea-${lIdx}-${exIdx}`);
+        let user = textarea.value.replace(/\s+/g,' ').trim();
+        let expected = ex.expectedContains.replace(/\s+/g,' ').trim();
+        const fb = document.getElementById(`feedback-${lIdx}-${exIdx}`);
+        if(user.includes(expected) || user===expected) fb.innerHTML = `<div class="correct-feedback">🎉 ¡Correcto!</div>`;
+        else fb.innerHTML = `<div class="wrong-feedback">❌ Pista: ${ex.hint}<br>Esperaba: <code>${ex.expectedContains}</code></div>`;
+    };
+
+    function attachTooltips(){
+        const keywords = document.querySelectorAll('.keyword');
+        let tt = null;
+        keywords.forEach(el=>{
+            el.addEventListener('mouseenter',(e)=>{
+                if(tt) tt.remove();
+                tt = document.createElement('div');
+                tt.className = 'tooltip-glossary';
+                tt.innerText = `📖 ${el.getAttribute('data-translate') || "Concepto Java"}`;
+                document.body.appendChild(tt);
+                const rect = e.target.getBoundingClientRect();
+                tt.style.left = rect.left + window.scrollX + 'px';
+                tt.style.top = rect.bottom + window.scrollY + 5 + 'px';
+            });
+            el.addEventListener('mouseleave',()=>{ if(tt) tt.remove(); });
+        });
+    }
+
+    document.getElementById("resetProgressBtn")?.addEventListener("click",()=>{
+        if(confirm("Borrar todo el progreso?")){ completed = Array(lessons.length).fill(false); localStorage.setItem("javaProgress20",JSON.stringify(completed)); renderMenu(); loadLesson(currentLessonId); }
+    });
+
+    // CONSULTOR MEJORADO
+    const chatBtn = document.getElementById('chatButton');
+    const chatWin = document.getElementById('chatWindow');
+    const closeChat = document.getElementById('closeChat');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const chatMsgs = document.getElementById('chatMessages');
+    function toggleChat(){ chatWin.classList.toggle('hidden'); }
+    chatBtn.addEventListener('click',toggleChat);
+    closeChat.addEventListener('click',toggleChat);
+    function addMsg(text, isUser){
+        const div = document.createElement('div');
+        div.className = `chat-message ${isUser ? 'user-msg' : 'bot-msg'}`;
+        div.innerText = text;
+        chatMsgs.appendChild(div);
+        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }
+    function botReply(question){
+        const q = question.toLowerCase();
+        if(q.includes('bucle for')) return "For repite un bloque un número fijo de veces: for(inicio; condición; incremento){ } Ej: for(int i=0;i<5;i++){ System.out.println(i); } imprime 0 a 4.";
+        if(q.includes('arraylist')) return "ArrayList es una lista dinámica. Ej: ArrayList<String> lista = new ArrayList<>(); lista.add(\"Hola\"); lista.get(0);";
+        if(q.includes('lambda')) return "Lambda es una función anónima. Ej: (param) -> expresión. Útil para trabajar con colecciones: lista.forEach(e -> System.out.println(e));";
+        if(q.includes('stream')) return "Stream permite procesar colecciones de forma funcional: lista.stream().filter(s->s.length()>3).map(String::toUpperCase).collect(Collectors.toList());";
+        if(q.includes('fecha')||q.includes('localdate')) return "LocalDate representa una fecha (año, mes, día). Ej: LocalDate hoy = LocalDate.now(); LocalDate mañana = hoy.plusDays(1);";
+        if(q.includes('archivo')||q.includes('file')) return "Para leer archivos: Scanner sc = new Scanner(new File(\"ruta\")); Para escribir: PrintWriter pw = new PrintWriter(\"ruta\");";
+        if(q.includes('enum')) return "Un enum define un conjunto fijo de constantes. Ej: enum Dia { LUNES, MARTES } Dia d = Dia.LUNES;";
+        if(q.includes('genérico')||q.includes('generico')) return "Los genéricos permiten parametrizar tipos. Ej: class Caja<T>{ T obj; } Caja<String> caja = new Caja<>();";
+        if(q.includes('string')) return "String tiene métodos útiles: length(), substring(inicio,fin), indexOf(caracter), split(regex), toUpperCase(), etc.";
+        if(q.includes('excepcion')||q.includes('try')) return "Excepciones: try { código peligroso } catch(Excepcion e) { manejo } finally { siempre se ejecuta }";
+        if(q.includes('operador ternario')) return "Operador ternario: condición ? valor_si_true : valor_si_false. Ej: int mayor = (a>b) ? a : b;";
+        return "Puedo ayudarte con: variables, if, bucles, arrays, métodos, clases, ArrayList, excepciones, strings, fechas, lambda, streams, archivos, enum, genéricos. ¿Sobre qué quieres más detalles?";
+    }
+    function handleQuestion(){
+        const txt = chatInput.value.trim();
+        if(txt==="") return;
+        addMsg(txt, true);
+        chatInput.value = "";
+        const reply = botReply(txt);
+        setTimeout(()=> addMsg(reply, false), 200);
+    }
+    chatSend.addEventListener('click', handleQuestion);
+    chatInput.addEventListener('keypress',(e)=>{ if(e.key==='Enter') handleQuestion(); });
+
+    renderMenu();
+    loadLesson(0);
+    attachTooltips();
+    new MutationObserver(()=>attachTooltips()).observe(document.getElementById("dynamicArea"),{childList:true,subtree:true});
+</script>
+</body>
+</html>
